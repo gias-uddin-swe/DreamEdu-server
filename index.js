@@ -22,9 +22,9 @@ app.get("/", (req, res) => {
 });
 
 client.connect((err) => {
-  const applyCollection = client
+  const confirmApplyCollection = client
     .db(`${process.env.DB_NAME}`)
-    .collection("apply");
+    .collection("confirmApply");
   const reviewCollection = client
     .db(`${process.env.DB_NAME}`)
     .collection("review");
@@ -57,6 +57,42 @@ client.connect((err) => {
   });
   app.get("/ClientReview", (req, res) => {
     reviewCollection.find({}).toArray((err, documents) => {
+      res.send(documents);
+    });
+  });
+
+  app.post("/confirmStudent", (req, res) => {
+    confirmApplyCollection.insertOne(req.body).then((result) => {
+      res.send(result.insertedCount > 0);
+      console.log(result.insertedCount > 0);
+    });
+  });
+  app.get("/myApplyList", (req, res) => {
+    console.log(req.query.email);
+    confirmApplyCollection
+      .find({ email: req.query.email })
+      .toArray((err, documents) => {
+        res.send(documents);
+      });
+  });
+
+  app.post("/addAdmin", (req, res) => {
+    adminCollection.insertOne(req.body).then((result) => {
+      console.log(result.insertedCount > 0);
+      res.send(result.insertedCount > 0);
+    });
+  });
+
+  app.delete("/deleteService/:id", (req, res) => {
+    universityCollection
+      .deleteOne({ _id: ObjectId(req.params.id) })
+      .then((result) => {
+        res.send(result.deletedCount > 0);
+      });
+  });
+
+  app.get("/allOrders", (req, res) => {
+    confirmApplyCollection.find({}).toArray((err, documents) => {
       res.send(documents);
     });
   });
