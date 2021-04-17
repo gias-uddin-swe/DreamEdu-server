@@ -96,6 +96,58 @@ client.connect((err) => {
       res.send(documents);
     });
   });
+  app.get("/checkAdmin", (req, res) => {
+    adminCollection
+      .find({ email: req.query.email })
+      .toArray((err, documents) => {
+        console.log(documents.length > 0);
+        res.send(documents.length > 0);
+      });
+  });
+
+  app.patch("/updateStatus/:id", (req, res) => {
+    console.log(req.body.optionValue);
+    confirmApplyCollection
+      .updateOne(
+        { _id: ObjectId(req.params.id) },
+        {
+          $set: { process: req.body.optionValue },
+        }
+      )
+      .then((result) => {
+        console.log(result.modifiedCount > 0);
+        res.send(result.modifiedCount > 0);
+      });
+  });
+
+  app.patch("/update/:id", (req, res) => {
+    console.log(req.body.name);
+    universityCollection
+      .updateOne(
+        { _id: ObjectId(req.params.id) },
+        {
+          $set: {
+            name: req.body.name,
+            location: req.body.name,
+            serviceCharge: req.body.serviceCharge,
+            type: req.body.type,
+          },
+        }
+      )
+      .then((result) => {
+        res.send(result.modifiedCount > 0);
+        console.log(result.modifiedCount > 0);
+      });
+  });
+
+  app.get("/serviceUpdate/:id", (req, res) => {
+    console.log(req.params.id);
+    universityCollection
+      .find({ _id: ObjectId(req.params.id) })
+      .toArray((err, documents) => {
+        res.send(documents[0]);
+      });
+  });
 });
 
 app.listen(process.env.PORT || port);
